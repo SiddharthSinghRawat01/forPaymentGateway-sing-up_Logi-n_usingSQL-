@@ -32,14 +32,25 @@ app.post('/sign-up',(req,res)=>{
     const Name = req.body.name;
     let Password = req.body.password;
 
-    const sql = "INSERT into sign (name, password) VALUES ('"+Name+"','"+Password+"')";
-    connection.query(sql,(err,result)=>{
+    bcrypt.hash(Password,8, function(err,hash){
         if(err){
             throw err
         } else {
-            console.log(result);
+
+            Password = hash;
+            
+            const sql = "INSERT into sign (name, password) VALUES ('"+Name+"','"+Password+"')";
+            connection.query(sql,(err,result)=>{
+                if(err){
+                    throw err
+                } else {
+                    console.log(result);
+                }
+            })
         }
-    })
+    });
+
+    
 });
 
 app.post('/login',(req,res)=>{
@@ -68,20 +79,25 @@ app.post('/password',(req,res)=>{
     const Name = req.body.name;
     let Password = req.body.password;
 
-    let sql = "SELECT password FROM sign WHERE name = '"+Name+"'";
-    connection.query(sql,(err,result,feilds)=>{
+    let sql = "SELECT * FROM sign WHERE name = '"+Name+"'";
+    connection.query(sql,(err,foundUser,feilds)=>{
         if (err){
             throw err
         } else {
-            if(result.length >0){
-                if(result[0].password=== Password){
-                    res.send("matched")
-                    console.log('matched')
-                }else{
-                    res.send("not matched")
-                    console.log('not matched')
+            console.log(foundUser[0].password)
+            console.log(Password)
+            bcrypt.compare(Password, foundUser[0].password, function(err, result) {
+                if( err){
+                    throw err
+                } else if(result){
+                    console.log(Password)
+                    console.log(result)
+                    console.log(foundUser[0].password)
+                } else {
+                    console.log('no match')
                 }
-            }
+                 
+             })  
         }
     })
 

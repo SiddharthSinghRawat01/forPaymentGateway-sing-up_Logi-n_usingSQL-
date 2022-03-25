@@ -84,10 +84,6 @@ app.post('/login',(req,res)=>{
  
 });
 
-// app.get('/password',(req,res)=>{
-//     res.render("password",{Name : Name})
-// })
-
 app.post('/password',(req,res)=>{
     const Name = req.body.name;
     let Password = req.body.password;
